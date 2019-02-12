@@ -67,10 +67,25 @@
 			d3.select("#tooltip").transition().duration(500).style("opacity", 0);      
 		}
 		
+        function onClick()
+        {
+            
+            var text = $(event.target)[0].classList[1];
+            var color = $(event.target)[0].style.fill;
+            if(color == "rgb(0, 0, 0)")
+                {
+                    $(event.target)[0].style.fill = "rgb(128, 0, 38)";
+                }
+            else{
+                $(event.target)[0].style.fill = "rgb(0, 0, 0)";
+            }
+            color = $(event.target)[0].style.fill;
+            console.log(color);
+        }
 		d3.select(id).selectAll(".state")
-			.data(uStatePaths).enter().append("path").attr("class","state").attr("d",function(d){ return d.d;})
+			.data(uStatePaths).enter().append("path").attr("class",function(d){ return "state " + d.id;}).attr("d",function(d){ return d.d;})
 			.style("fill",function(d){ return data[d.id].color; })
-			.on("mouseover", mouseOver).on("mouseout", mouseOut);
+			.on("mouseover", mouseOver).on("mouseout", mouseOut).on("click",onClick);
 	}
 	this.uStates=uStates;
 })();

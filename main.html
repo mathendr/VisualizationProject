@@ -1,83 +1,345 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <style>
-	.state{
-		fill: none;
-		stroke: #a9a9a9;
-		stroke-width: 1;
-	}
-	.state:hover{
-		fill-opacity:0.5;
-	}
-	#tooltip {   
-		position: absolute;           
-		text-align: center;
-		padding: 20px;             
-		margin: 10px;
-		font: 12px sans-serif;        
-		background: lightsteelblue;   
-		border: 1px;      
-		border-radius: 2px;           
-		pointer-events: none;         
-	}
-	#tooltip h4{
-		margin:0;
-		font-size:14px;
-	}
-	#tooltip{
-		background:rgba(0,0,0,0.9);
-		border:1px solid grey;
-		border-radius:5px;
-		font-size:12px;
-		width:auto;
-		padding:4px;
-		color:white;
-		opacity:0;
-	}
-	#tooltip table{
-		table-layout:fixed;
-	}
-	#tooltip tr td{
-		padding:0;
-		margin:0;
-	}
-	#tooltip tr td:nth-child(1){
-		width:50px;
-	}
-	#tooltip tr td:nth-child(2){
-		text-align:center;
-	}
+    .state {
+        fill: none;
+        stroke: #a9a9a9;
+        stroke-width: 1;
+    }
+
+    .state:hover {
+        fill-opacity: 0.5;
+    }
+
+    #tooltip {
+        position: absolute;
+        text-align: center;
+        padding: 20px;
+        margin: 10px;
+        font: 12px sans-serif;
+        background: lightsteelblue;
+        border: 1px;
+        border-radius: 2px;
+        pointer-events: none;
+    }
+
+    #tooltip h4 {
+        margin: 0;
+        font-size: 14px;
+    }
+
+    #tooltip {
+        background: rgba(0, 0, 0, 0.9);
+        border: 1px solid grey;
+        border-radius: 5px;
+        font-size: 12px;
+        width: auto;
+        padding: 4px;
+        color: white;
+        opacity: 0;
+    }
+
+    #tooltip table {
+        table-layout: fixed;
+    }
+
+    #tooltip tr td {
+        padding: 0;
+        margin: 0;
+    }
+
+    #tooltip tr td:nth-child(1) {
+        width: 50px;
+    }
+
+    #tooltip tr td:nth-child(2) {
+        text-align: center;
+    }
+
 </style>
+<style type="text/css">
+    /* 13. Basic Styling with CSS */
+
+    /* Style the lines by removing the fill and applying a stroke */
+    .line {
+        fill: none;
+        stroke: #ffab00;
+        stroke-width: 3;
+    }
+
+    .overlay {
+        fill: none;
+        pointer-events: all;
+    }
+
+    /* Style the dots by assigning a fill and stroke */
+    .dot {
+        fill: #ffab00;
+        stroke: #fff;
+    }
+
+    .focus circle {
+        fill: none;
+        stroke: steelblue;
+    }
+
+</style>
+
 <body>
-    <h1 style = "text-align: center">Number Of Assaults on Police Officers</h1>
-<div id="tooltip"></div><!-- div to hold tooltip. -->
-<svg width="960" height="600" id="statesvg"></svg> <!-- svg to hold the map. -->
-<script src="uStates.js"></script> <!-- creates uStates. -->
-<script src="http://d3js.org/d3.v3.min.js"></script>
+    <h1 style="text-align: center">Number Of Assaults on Police Officers</h1>
+    <div id="tooltip"></div><!-- div to hold tooltip. -->
+    <div id='tooltip2' style='position:absolute;background-color:lightgray;padding:5px'></div>
+    <svg width="960" height="600" id="statesvg"></svg> <!-- svg to hold the map. -->
+    <script src="uStates.js"></script> <!-- creates uStates. -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="http://d3js.org/d3.v4.min.js"></script>
+    <script src="https://d3js.org/d3-array.v1.min.js"></script>
+    <script src="https://d3js.org/d3-collection.v1.min.js"></script>
+    <script src="https://d3js.org/d3-color.v1.min.js"></script>
+    <script src="https://d3js.org/d3-format.v1.min.js"></script>
+    <script src="https://d3js.org/d3-interpolate.v1.min.js"></script>
+    <script src="https://d3js.org/d3-time.v1.min.js"></script>
+    <script src="https://d3js.org/d3-time-format.v2.min.js"></script>
+    <script src="https://d3js.org/d3-scale.v2.min.js"></script>
+    <script src="https://d3js.org/d3-path.v1.min.js"></script>
+    <script src="http://d3js.org/d3.v4.0.0-alpha.44.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
-<script>
 
-	function tooltipHtml(n, d){	/* function to create html content string in tooltip div. */
-		return "<h4>"+n+"</h4>";
-	}
-	
-	var sampleData ={};	/* Sample random data. */	
-	["HI", "AK", "FL", "SC", "GA", "AL", "NC", "TN", "RI", "CT", "MA",
-	"ME", "NH", "VT", "NY", "NJ", "PA", "DE", "MD", "WV", "KY", "OH", 
-	"MI", "WY", "MT", "ID", "WA", "DC", "TX", "CA", "AZ", "NV", "UT", 
-	"CO", "NM", "OR", "ND", "SD", "NE", "IA", "MS", "IN", "IL", "MN", 
-	"WI", "MO", "AR", "OK", "KS", "LS", "VA"]
-		.forEach(function(d){ 
-			sampleData[d]={color:"#000000"}; 
-		});
-	
-	/* draw states on id #statesvg */	
-	uStates.draw("#statesvg", sampleData, tooltipHtml);
-	
-	d3.select(self.frameElement).style("height", "600px"); 
-</script>
-<script>   
-</script>
+    <script>
+        function tooltipHtml(n, d) { /* function to create html content string in tooltip div. */
+            return "<h4>" + n + "</h4>";
+        }
 
-    
+        var sampleData = {}; /* Sample random data. */
+        ["HI", "AK", "FL", "SC", "GA", "AL", "NC", "TN", "RI", "CT", "MA",
+            "ME", "NH", "VT", "NY", "NJ", "PA", "DE", "MD", "WV", "KY", "OH",
+            "MI", "WY", "MT", "ID", "WA", "DC", "TX", "CA", "AZ", "NV", "UT",
+            "CO", "NM", "OR", "ND", "SD", "NE", "IA", "MS", "IN", "IL", "MN",
+            "WI", "MO", "AR", "OK", "KS", "LS", "VA"
+        ]
+        .forEach(function(d) {
+            sampleData[d] = {
+                color: "#000000"
+            };
+        });
+
+        /* draw states on id #statesvg */
+        uStates.draw("#statesvg", sampleData, tooltipHtml);
+
+        d3.select(self.frameElement).style("height", "600px");
+
+    </script>
+    <script>
+        var TotalData;
+        // Set the dimensions of the canvas / graph
+        var margin = {
+                top: 30,
+                right: 20,
+                bottom: 70,
+                left: 50
+            },
+            width = 800,
+            height = 600;
+        // Parse the date / time
+        var parseDate = d3.time.format("%Y").parse;
+        // Set the ranges
+        var x = d3.time.scale().range([0, width]);
+        var y = d3.scale.linear().range([height, 0]);
+
+        var yScale = d3.scaleLinear()
+            .domain([0, 1000]) // input 
+            .range([height, 0]);
+        var xScale = d3.scaleLinear()
+            .domain([1995, 2017]) // input
+            .range([0, width]);
+
+        // Define the axes
+        var xAxis = d3.svg.axis().scale(x)
+            .orient("bottom").ticks(5);
+        var yAxis = d3.svg.axis().scale(y)
+            .orient("left").ticks(11);
+
+        function make_x_gridlines() {
+            return d3.axisBottom(x)
+                .ticks(11)
+        }
+
+        // gridlines in y axis function
+        function make_y_gridlines() {
+            return d3.axisLeft(y)
+                .ticks(10)
+        }
+
+        // Define the line
+        var priceline = d3.svg.line()
+            .x(function(d) {
+                return x(d.Year);
+            })
+            .y(function(d) {
+                return y(d.Value);
+            });
+        var color = d3.scale.category20b();
+        setColors(color);
+        // Adds the svg canvas
+        var svg = d3.select("body")
+            .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform",
+                "translate(" + margin.left + "," + margin.top + ")");
+        // Get the data
+        d3.csv("FinalData.csv", function(error, data) {
+            data.forEach(function(d) {
+                d.Year = parseDate(d.Year);
+                d.Value = +d.Value;
+            });
+            // Scale the range of the data
+            x.domain(d3.extent(data, function(d) {
+                return d.Year;
+            }));
+            y.domain([0, d3.max(data, function(d) {
+                return d.Value;
+            })]);
+            // Nest the entries by symbol
+            var dataNest = d3.nest()
+                .key(function(d) {
+                    return d.State;
+                })
+                .entries(data);
+            // set the colour scale
+
+            legendSpace = width / dataNest.length; // spacing for the legend
+            // Loop through each symbol / key
+            dataNest.forEach(function(d, i) {
+                svg.append("path")
+                    .attr("class", "line")
+                    .style("stroke", function() { // Add the colours dynamically
+                        return d.color = color(d.key);
+                    })
+                    .attr("id", 'tag' + d.key.replace(/\s+/g, '')) // assign ID
+                    .attr("d", priceline(d.values));
+                // Add the Legend
+                // Determine if current line is visible 
+                var active = true,
+                    newOpacity = active ? 0 : 1;
+                // Hide or show the elements based on the ID
+                d3.select("#tag" + d.key.replace(/\s+/g, ''))
+                    .transition().duration(10)
+                    .style("opacity", newOpacity);
+                // Update whether or not the elements are active
+                d.active = false;
+            });
+            // Add the X Axis
+            svg.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + height + ")")
+                .call(d3.axisBottom(xScale));
+            // Add the Y Axis
+            svg.append("g")
+                .attr("class", "y axis")
+                .call(d3.axisLeft(yScale));
+            TotalData = dataNest;
+            // add the X gridlines
+            svg.append("g")
+                .attr("class", "grid")
+                .attr("transform", "translate(0," + height + ")")
+                .call(make_x_gridlines()
+                    .tickSize(-height)
+                    .tickFormat("")
+                )
+
+            // add the Y gridlines
+            svg.append("g")
+                .attr("class", "grid")
+                .call(make_y_gridlines()
+                    .tickSize(-width)
+                    .tickFormat("")
+                )
+        });
+
+        var currentData = [];
+        var currentMax = 0;
+
+        function updateData(state, active) {
+            var max = 1000;
+            //console.log(state + " " + active);
+
+            TotalData.forEach(function(d, i) {
+                // Add the Legend
+                // Determine if current line is visible
+
+
+                if (active && d.key == state) {
+                    var newOpacity = 1;
+
+
+                    // Hide or show the elements based on the ID
+                    d3.select("#tag" + d.key.replace(/\s+/g, ''))
+                        .transition().duration(1000)
+                        .style("opacity", newOpacity);
+                    // Update whether or not the elements are active
+                    d.active = active;
+                    currentData.push(d);
+                }
+                if (!active && d.key == state) {
+                    var newOpacity = 0
+                    // Hide or show the elements based on the ID
+                    d3.select("#tag" + d.key.replace(/\s+/g, ''))
+                        .transition().duration(1000)
+                        .style("opacity", newOpacity);
+                    // Update whether or not the elements are active
+                    d.active = active;
+                }
+                if (d.active) {
+                    var temp = findNewMax(d.values);
+                    if (temp > max) {
+                        max = temp;
+                        currentMax = max;
+                    }
+
+
+                }
+
+            });
+            y = d3.scale.linear().range([height, 0]);
+            y.domain([0, max]);
+
+            yScale = d3.scaleLinear()
+                .domain([0, max]) // input 
+                .range([height, 0]);
+
+            yAxis = d3.svg.axis().scale(y)
+                .orient("left").ticks(10);
+            svg.selectAll(".y.axis").remove();
+            svg.append("g")
+                .attr("class", "y axis")
+                .call(d3.axisLeft(yScale));
+            svg.selectAll(".line").remove();
+
+            TotalData.forEach(function(d, i) {
+                if (d.active) {
+                    svg.append("path")
+                        .attr("class", "line")
+                        .style("stroke", function() { // Add the colours dynamically
+                            return d.color = color(d.key);
+                        })
+                        .attr("id", 'tag' + d.key.replace(/\s+/g, '')) // assign ID
+                        .attr("d", priceline(d.values));
+                }
+            });
+        }
+
+        function findNewMax(values) {
+            var max = 0;
+            values.forEach(function(d) {
+                if (d.Value > max)
+                    max = d.Value;
+            });
+            return max;
+        }
+
+    </script>
+
 </body>

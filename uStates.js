@@ -276,10 +276,10 @@
             var text = $(event.target)[0].classList[1];
             var color = $(event.target)[0].style.fill;
             var active = true;
-            if (color == "rgb(0, 0, 0)") {
+            if (color == "rgb(255, 255, 255)") {
                 $(event.target)[0].style.fill = colors(text);
             } else {
-                $(event.target)[0].style.fill = "rgb(0, 0, 0)";
+                $(event.target)[0].style.fill = "rgb(255, 255, 255)";
                 active = false;
             }
             var clicked = $(event.target);

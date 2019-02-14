@@ -56,6 +56,10 @@
         text-align: center;
     }
 
+    body {
+        background-color: darkgray;
+    }
+
 </style>
 <style type="text/css">
     /* 13. Basic Styling with CSS */
@@ -107,7 +111,8 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 
     <script>
-        function tooltipHtml(n, d) { /* function to create html content string in tooltip div. */
+        function tooltipHtml(n, d) {
+            /* function to create html content string in tooltip div. */
             return "<h4>" + n + "</h4>";
         }
 
@@ -120,7 +125,7 @@
         ]
         .forEach(function(d) {
             sampleData[d] = {
-                color: "#000000"
+                color: "#ffffff"
             };
         });
 
@@ -156,13 +161,13 @@
 
         // Define the axes
         var xAxis = d3.svg.axis().scale(x)
-            .orient("bottom").ticks(5);
+            .orient("bottom").ticks(12);
         var yAxis = d3.svg.axis().scale(y)
-            .orient("left").ticks(11);
+            .orient("left").ticks(12);
 
         function make_x_gridlines() {
             return d3.axisBottom(x)
-                .ticks(11)
+                .ticks(12)
         }
 
         // gridlines in y axis function
@@ -262,6 +267,18 @@
         var currentData = [];
         var currentMax = 0;
 
+        function findPosition(value) {
+            var removed = [];
+            for (var x = 0; x < currentData.length; x++) {
+                if (currentData[x].key == value) {
+
+                } else {
+                    removed.push(currentData[x]);
+                }
+            }
+            currentData = removed;
+        }
+
         function updateData(state, active) {
             var max = 1000;
             //console.log(state + " " + active);
@@ -291,6 +308,8 @@
                         .style("opacity", newOpacity);
                     // Update whether or not the elements are active
                     d.active = active;
+                    findPosition(state);
+
                 }
                 if (d.active) {
                     var temp = findNewMax(d.values);
@@ -298,8 +317,6 @@
                         max = temp;
                         currentMax = max;
                     }
-
-
                 }
 
             });
@@ -339,6 +356,99 @@
             });
             return max;
         }
+
+        const tooltip = d3.select('#tooltip2');
+        const tooltipLine = svg.append('line');
+
+        function ToolTipSetup() {
+            const margin = {
+                top: 0,
+                right: 0,
+                bottom: -400,
+                left: 0
+            };
+            const width = 800 - margin.left - margin.right;
+            const height = 400 - margin.top - margin.bottom;
+            const x = d3.scaleLinear().domain([1995, 2017]).range([0, width]);
+            const y = d3.scaleLinear().domain([0, currentMax]).range([height, 0]);
+            const line = d3.line().x(d => x(d.Year)).y(d => y(d.Value));
+
+
+            svg.selectAll()
+                .data(currentData).enter()
+                .append('path')
+                .attr('fill', 'none')
+                .attr('stroke', d => d.color)
+                .attr('stroke-width', 2)
+                .datum(d => d.Year)
+                .attr('d', line);
+
+            tipBox = svg.append('rect')
+                .attr('width', width)
+                .attr('height', height)
+                .attr('opacity', 0)
+                .on('mousemove', drawTooltip)
+                .on('mouseout', removeTooltip);
+        }
+
+        function drawTooltip() {
+            const drawLine = (x.invert(d3.mouse(tipBox.node())[0]));
+            //console.log(drawLine);
+            var year = (x.invert(d3.mouse(tipBox.node())[0]) + 1 / 10 * 10).split(" ")[3];
+            //console.log(year);
+            currentData.sort((a, b) => {
+                var aval, bval;
+
+                try {
+                    bval = b.values.find(function(element) {
+                        var tmp = (element.Year) + "";
+                        if (tmp.split(" ")[3] == year)
+                            return element;
+                    }).Value
+                } catch (err) {
+                    bval = 0;
+                }
+
+                try {
+                    aval = a.values.find(function(element) {
+                        var tmp = (element.Year) + "";
+                        if (tmp.split(" ")[3] == year)
+                            return element
+                    }).Value;
+                } catch (err) {
+                    aval = 0;
+                }
+                return bval - aval;
+            })
+            //console.log(currentData);
+            tooltipLine.attr('stroke', 'black')
+                .attr('x1', x(drawLine))
+                .attr('x2', x(drawLine))
+                .attr('y1', 0)
+                .attr('y2', height);
+            //console.log(d3.event.pageX);
+            tooltip.html(year)
+                .style('display', 'block')
+                .style('left', (d3.event.pageX + 20) + "px")
+                .style('top', (d3.event.pageY - 20) + "px")
+            .style('font-size', "2em")
+                .selectAll()
+                .data(currentData).enter()
+                .append('div')
+                .style('color', d => d.color)
+                .html(d => d.values[0].State + ': ' + d.values.find(function(element) {
+                    var tmp = (element.Year) + "";
+                    if (tmp.split(" ")[3] == year)
+                        return element;
+                }).Value);
+
+        }
+
+        function removeTooltip() {
+            if (tooltip) tooltip.style('display', 'none');
+            if (tooltipLine) tooltipLine.attr('stroke', 'none');
+        }
+        ToolTipSetup();
 
     </script>
 

@@ -57,7 +57,7 @@
     }
 
     body {
-        background-color: darkgray;
+        background-color: lightslategray;
     }
 
 </style>
@@ -95,6 +95,8 @@
     <div id='tooltip2' style='position:absolute;background-color:lightgray;padding:5px'></div>
     <svg width="960" height="600" id="statesvg"></svg> <!-- svg to hold the map. -->
     <script src="uStates.js"></script> <!-- creates uStates. -->
+
+    <!-- Loading all of the required libraries-->
     <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.js"></script>
     <script src="http://d3js.org/d3.v3.min.js"></script>
     <script src="http://d3js.org/d3.v4.min.js"></script>
@@ -110,13 +112,14 @@
     <script src="http://d3js.org/d3.v4.0.0-alpha.44.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 
+    <!-- The Script for writing the map of the states-->
     <script>
         function tooltipHtml(n, d) {
-            /* function to create html content string in tooltip div. */
+            /* function to create html content string in tooltip div of the states map. */
             return "<h4>" + n + "</h4>";
         }
 
-        var sampleData = {}; /* Sample random data. */
+        var sampleData = {}; /* creating the states map. */
         ["HI", "AK", "FL", "SC", "GA", "AL", "NC", "TN", "RI", "CT", "MA",
             "ME", "NH", "VT", "NY", "NJ", "PA", "DE", "MD", "WV", "KY", "OH",
             "MI", "WY", "MT", "ID", "WA", "DC", "TX", "CA", "AZ", "NV", "UT",
@@ -135,6 +138,8 @@
         d3.select(self.frameElement).style("height", "600px");
 
     </script>
+
+    <!-- the script for writing the line chart-->
     <script>
         var TotalData;
         // Set the dimensions of the canvas / graph
@@ -152,11 +157,12 @@
         var x = d3.time.scale().range([0, width]);
         var y = d3.scale.linear().range([height, 0]);
 
+        //sets the max and min for the axis
         var yScale = d3.scaleLinear()
-            .domain([0, 1000]) // input 
+            .domain([0, 1000])
             .range([height, 0]);
         var xScale = d3.scaleLinear()
-            .domain([1995, 2017]) // input
+            .domain([1995, 2017])
             .range([0, width]);
 
         // Define the axes
@@ -184,8 +190,11 @@
             .y(function(d) {
                 return y(d.Value);
             });
+
+        //defines the colors for the states
         var color = d3.scale.category20b();
         setColors(color);
+
         // Adds the svg canvas
         var svg = d3.select("body")
             .append("svg")
@@ -213,9 +222,7 @@
                     return d.State;
                 })
                 .entries(data);
-            // set the colour scale
 
-            legendSpace = width / dataNest.length; // spacing for the legend
             // Loop through each symbol / key
             dataNest.forEach(function(d, i) {
                 svg.append("path")
@@ -226,6 +233,7 @@
                     .attr("id", 'tag' + d.key.replace(/\s+/g, '')) // assign ID
                     .attr("d", priceline(d.values));
                 // Add the Legend
+
                 // Determine if current line is visible 
                 var active = true,
                     newOpacity = active ? 0 : 1;
@@ -264,9 +272,12 @@
                 )
         });
 
+        //the currently visible data for the chart
         var currentData = [];
+        //the current max of the y axis
         var currentMax = 0;
 
+        //finds and removes the correct object from the current data list and changes the current data array
         function findPosition(value) {
             var removed = [];
             for (var x = 0; x < currentData.length; x++) {
@@ -279,15 +290,13 @@
             currentData = removed;
         }
 
+        //updates the data including the axis and lines in the chart when a new state is clicked on or removed
         function updateData(state, active) {
             var max = 1000;
             //console.log(state + " " + active);
 
             TotalData.forEach(function(d, i) {
-                // Add the Legend
-                // Determine if current line is visible
-
-
+                //checks to see if the state is now active or diabled 
                 if (active && d.key == state) {
                     var newOpacity = 1;
 
@@ -311,6 +320,7 @@
                     findPosition(state);
 
                 }
+                //finds the new max of the current set of data
                 if (d.active) {
                     var temp = findNewMax(d.values);
                     if (temp > max) {
@@ -320,6 +330,7 @@
                 }
 
             });
+            //scale the y axis correctly
             y = d3.scale.linear().range([height, 0]);
             y.domain([0, max]);
 
@@ -329,10 +340,12 @@
 
             yAxis = d3.svg.axis().scale(y)
                 .orient("left").ticks(10);
+            //removes the old scaling with the new one
             svg.selectAll(".y.axis").remove();
             svg.append("g")
                 .attr("class", "y axis")
                 .call(d3.axisLeft(yScale));
+            //removes the old lines and adds the new ones with the proper scaling
             svg.selectAll(".line").remove();
 
             TotalData.forEach(function(d, i) {
@@ -348,6 +361,7 @@
             });
         }
 
+        //finds the new max based on the currently visible data. defaults to 1000 if nothing is selected or the values are less than 1000
         function findNewMax(values) {
             var max = 0;
             values.forEach(function(d) {
@@ -357,9 +371,11 @@
             return max;
         }
 
+        //tool tip and line declaration
         const tooltip = d3.select('#tooltip2');
         const tooltipLine = svg.append('line');
 
+        //sets up the tooltip
         function ToolTipSetup() {
             const margin = {
                 top: 0,
@@ -374,6 +390,7 @@
             const line = d3.line().x(d => x(d.Year)).y(d => y(d.Value));
 
 
+            //sets the line up for the chart wherever the mouse is located on the chart
             svg.selectAll()
                 .data(currentData).enter()
                 .append('path')
@@ -383,6 +400,7 @@
                 .datum(d => d.Year)
                 .attr('d', line);
 
+            //sets up the tooltip box that follows just to the right and down of the mouse when on the chart
             tipBox = svg.append('rect')
                 .attr('width', width)
                 .attr('height', height)
@@ -391,14 +409,18 @@
                 .on('mouseout', removeTooltip);
         }
 
+        //draw the tooltip helper function 
         function drawTooltip() {
+            //gets the position of the mouse to get the correct year from it
             const drawLine = (x.invert(d3.mouse(tipBox.node())[0]));
-            //console.log(drawLine);
+            //gets the year that the mouse is located to help draw the line
             var year = (x.invert(d3.mouse(tipBox.node())[0]) + 1 / 10 * 10).split(" ")[3];
-            //console.log(year);
+
+            //sorts the data for the tooltipbox so the data that is the largest is on the top of the tooltip
             currentData.sort((a, b) => {
                 var aval, bval;
 
+                //gets the data and if nothing is there it is set to 0 so no errors will be thrown
                 try {
                     bval = b.values.find(function(element) {
                         var tmp = (element.Year) + "";
@@ -409,6 +431,7 @@
                     bval = 0;
                 }
 
+                //gets the second value or is set to 0 if there is nothing there so errors will not be thrown
                 try {
                     aval = a.values.find(function(element) {
                         var tmp = (element.Year) + "";
@@ -418,20 +441,22 @@
                 } catch (err) {
                     aval = 0;
                 }
+                //returns which one is greater
                 return bval - aval;
             })
-            //console.log(currentData);
+
+            //draws the line at the correct x axis point
             tooltipLine.attr('stroke', 'black')
                 .attr('x1', x(drawLine))
                 .attr('x2', x(drawLine))
                 .attr('y1', 0)
                 .attr('y2', height);
-            //console.log(d3.event.pageX);
+            //draws the box as the correct mouse location but 20 pixels ofset to not get in the way of the mouse
             tooltip.html(year)
                 .style('display', 'block')
                 .style('left', (d3.event.pageX + 20) + "px")
                 .style('top', (d3.event.pageY - 20) + "px")
-            .style('font-size', "2em")
+                .style('font-size', "2em")
                 .selectAll()
                 .data(currentData).enter()
                 .append('div')
@@ -444,6 +469,7 @@
 
         }
 
+        //removes the tooltip and box if the mouse is off the page
         function removeTooltip() {
             if (tooltip) tooltip.style('display', 'none');
             if (tooltipLine) tooltipLine.attr('stroke', 'none');
@@ -451,5 +477,4 @@
         ToolTipSetup();
 
     </script>
-
 </body>

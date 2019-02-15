@@ -1,4 +1,5 @@
 (function () {
+    //the paths of the states for the states map
     var uStatePaths = [
         {
             id: "HI",
@@ -259,32 +260,39 @@
     var uStates = {};
 
     uStates.draw = function (id, data, toolTip) {
+        //if the state is moused over
         function mouseOver(d) {
             d3.select("#tooltip").transition().duration(200).style("opacity", .9);
-
+            
+            //creates the tooltip that shows the name of the state
             d3.select("#tooltip").html(toolTip(d.n, data[d.id]))
                 .style("left", (d3.event.pageX) + "px")
                 .style("top", (d3.event.pageY - 28) + "px");
         }
 
+        //removes the tooltip when the mouse is no longer on the state
         function mouseOut() {
             d3.select("#tooltip").transition().duration(500).style("opacity", 0);
         }
 
+        //when the state is clicked
         function onClick() {
-
+            
+            //gets the state name and color of the target
             var text = $(event.target)[0].classList[1];
             var color = $(event.target)[0].style.fill;
             var active = true;
+            //determines if the color is not white then it is active
             if (color == "rgb(255, 255, 255)") {
                 $(event.target)[0].style.fill = colors(text);
             } else {
                 $(event.target)[0].style.fill = "rgb(255, 255, 255)";
                 active = false;
             }
-            var clicked = $(event.target);
+            //updates the data on the graph based on which state was clicked and if it was already active or not
             updateData(text, active);
         }
+        //declares all of the states and draws them on the svg
         d3.select(id).selectAll(".state")
             .data(uStatePaths).enter().append("path").attr("class", function (d) {
                 return "state " + d.id;
@@ -299,6 +307,7 @@
 
     this.uStates = uStates;
 })();
+//sets the colors from the initial list of colors in the main functions
 var colors;
 function setColors(colorslist) {
     colors = colorslist;

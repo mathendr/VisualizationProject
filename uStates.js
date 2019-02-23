@@ -309,6 +309,13 @@
 })();
 //sets the colors from the initial list of colors in the main functions
 var colors;
+var priority = true;
+
+function setPriority()
+{
+    priority = false;
+}
+
 function setColors(colorslist) {
     colors = colorslist;
 }
